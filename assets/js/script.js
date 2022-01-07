@@ -83,10 +83,10 @@ $(".list-group").on("blur", "input[type='text']", function () {
   // get current text
   var date = $(this).val().trim();
 
-// get the parents ul's id attribute
+  // get the parents ul's id attribute
   var status = $(this).closest(".list-group").attr("id").replace("list-", "");
 
-// get the tasks position in the list of other li elements
+  // get the tasks position in the list of other li elements
   var index = $(this).closest(".list-group-item").index();
 
   // update the task and re-save
@@ -94,13 +94,14 @@ $(".list-group").on("blur", "input[type='text']", function () {
   saveTasks();
 
   // recreate span element with bootstrap classes
-  var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(date);
+  var taskSpan = $("<span>")
+    .addClass("badge badge-primary badge-pill")
+    .text(date);
 
   // replace input with span element
-  $(this).replaceWith(taskSpan)
+  $(this).replaceWith(taskSpan);
 });
 // ==============================================
-
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function () {
