@@ -1,5 +1,7 @@
 var tasks = {};
 
+// ==============CREATE TASK======================
+
 var createTask = function (taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
@@ -11,9 +13,17 @@ var createTask = function (taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // check due date
+  auditTask(taskLi)
+
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
+
+// ==============================================
+
+
+// ==============LOAD TASK======================
 
 var loadTasks = function () {
   tasks = JSON.parse(localStorage.getItem("tasks"));
@@ -41,6 +51,8 @@ var saveTasks = function () {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+// ==============================================
+
 // ===========CLICK AND BLUR TEXT============
 $(".list-group").on("click", "p", function () {
   var text = $(this).text().trim();
@@ -64,10 +76,12 @@ $(".list-group").on("blur", "textarea", function () {
 });
 // ==============================================
 
-// ===========CLICK AND BLUR DATE============
+// ===========CLICK AND CHANGE DATE============
 $(".list-group").on("click", "span", function () {
+  // get current text
   var date = $(this).text().trim();
 
+  // create new input element
   var dateInput = $("<input>")
     .attr("type", "text")
     .addClass("form-control")
@@ -75,11 +89,19 @@ $(".list-group").on("click", "span", function () {
 
   $(this).replaceWith(dateInput);
 
+  // enable jquery ui datepicker
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function () {
+      $(this).trigger("change");
+    },
+  });
+
   dateInput.trigger("focus");
 });
 
 // value of the date was changed
-$(".list-group").on("blur", "input[type='text']", function () {
+$(".list-group").on("change", "input[type='text']", function () {
   // get current text
   var date = $(this).val().trim();
 
@@ -100,6 +122,8 @@ $(".list-group").on("blur", "input[type='text']", function () {
 
   // replace input with span element
   $(this).replaceWith(taskSpan);
+
+  auditTask($(taskSpan).closest(".list-group-item"))
 });
 // ==============================================
 
@@ -160,6 +184,24 @@ $("#trash").droppable({
 
 // ==============================================
 
+// ==============AUDIT TASKS======================
+
+var auditTask = function (taskEl) {
+  var date = $(taskEl).find("span").text().trim()
+
+  var time = moment(date, "L").set("hour", 17);
+
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger")
+
+  if (moment().isAfter(time)){
+    $(taskEl).addClass("list-group-item-danger")
+  } else if (Math.abs(moment().diff(time, "days"))<= 2) {
+    $(taskEl).addClass("list-group-item-warning")
+  }
+};
+
+// ===============================================
+
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function () {
   // clear values
@@ -170,6 +212,11 @@ $("#task-form-modal").on("show.bs.modal", function () {
 $("#task-form-modal").on("shown.bs.modal", function () {
   // highlight textarea
   $("#modalTaskDescription").trigger("focus");
+});
+
+// modal datepicker
+$("#modalDueDate").datepicker({
+  minDate: 1,
 });
 
 // save button in modal was clicked
