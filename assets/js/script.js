@@ -103,6 +103,63 @@ $(".list-group").on("blur", "input[type='text']", function () {
 });
 // ==============================================
 
+// ===========DRAGGABLE AND SORTABLE===============
+
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {},
+  deactivate: function (event) {},
+  over: function (event) {},
+  out: function (event) {},
+  update: function (event) {
+    // array to store the task data in
+    var tempArr = [];
+
+    // loop over current set of children in a sortable list
+    $(this)
+      .children()
+      .each(function () {
+        var text = $(this).find("p").text().trim();
+        var date = $(this).find("span").text().trim();
+
+        // add task data to the temp array as an object
+        tempArr.push({
+          text: text,
+          date: date,
+        });
+      });
+    var arrName = $(this).attr("id").replace("list-", "");
+
+    // update array on tasks object to save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  },
+});
+
+// ==============================================
+
+// ===========DRAGGABLE AND SORTABLE===============
+
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function (event, ui) {
+    ui.draggable.remove();
+    console.log("drop");
+  },
+  over: function (event, ui) {
+    console.log("over");
+  },
+  out: function (event, ui) {
+    console.log("out");
+  },
+});
+
+// ==============================================
+
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function () {
   // clear values
