@@ -14,14 +14,13 @@ var createTask = function (taskText, taskDate, taskList) {
   taskLi.append(taskSpan, taskP);
 
   // check due date
-  auditTask(taskLi)
+  auditTask(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
 
 // ==============================================
-
 
 // ==============LOAD TASK======================
 
@@ -52,6 +51,35 @@ var saveTasks = function () {
 };
 
 // ==============================================
+
+// ==============AUDIT TASKS======================
+
+var auditTask = function (taskEl) {
+  var date = $(taskEl).find("span").text().trim();
+
+  var time = moment(date, "L").set("hour", 17);
+
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  } else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+
+};
+
+// ===============================================
+
+// ===============AUDIT TASKS SO OFTEN==============
+
+setInterval(function () {
+  $(".card .list-group-item").each(function (index, el) {
+    auditTask(el);
+  });
+}, 1800000);
+
+// ===============================================
 
 // ===========CLICK AND BLUR TEXT============
 $(".list-group").on("click", "p", function () {
@@ -123,7 +151,7 @@ $(".list-group").on("change", "input[type='text']", function () {
   // replace input with span element
   $(this).replaceWith(taskSpan);
 
-  auditTask($(taskSpan).closest(".list-group-item"))
+  auditTask($(taskSpan).closest(".list-group-item"));
 });
 // ==============================================
 
@@ -183,24 +211,6 @@ $("#trash").droppable({
 });
 
 // ==============================================
-
-// ==============AUDIT TASKS======================
-
-var auditTask = function (taskEl) {
-  var date = $(taskEl).find("span").text().trim()
-
-  var time = moment(date, "L").set("hour", 17);
-
-  $(taskEl).removeClass("list-group-item-warning list-group-item-danger")
-
-  if (moment().isAfter(time)){
-    $(taskEl).addClass("list-group-item-danger")
-  } else if (Math.abs(moment().diff(time, "days"))<= 2) {
-    $(taskEl).addClass("list-group-item-warning")
-  }
-};
-
-// ===============================================
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function () {
